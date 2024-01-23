@@ -76,6 +76,7 @@ public class tile : MonoBehaviour
                     if(pieceToMove.getLegalAttackTiles()[0] != this){
                         publicLegal = true;
                     }
+                    Debug.Log(this.occupiedPiece().pieceHealth); 
                     
                     index = i;
                   

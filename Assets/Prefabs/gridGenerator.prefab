@@ -44,8 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8099477bf3b952468af85540f0f2ab0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 7488777595808384595, guid: 95ee901f3a884b048ac3f74016efd741,
-    type: 3}
+  tilePrefab: {fileID: 1651715510435324, guid: c4199ab7b397b114298f3918977797b6, type: 3}
   pawn: {fileID: 1213357437349106, guid: cb6a8f6d20d524a85bf5d4d1c6ba3d93, type: 3}
   rook: {fileID: 1037745782791696, guid: ae91a18cadda2480e9478488d2142fde, type: 3}
   knight: {fileID: 1943414466066380, guid: 45e10aea18beb495d9489aed31b95270, type: 3}

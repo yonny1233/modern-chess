@@ -77,6 +77,7 @@ public abstract class Piece : MonoBehaviour
         }
 
     }
+
     public void displayPositions(bool x){
 
         List<tile> both = getLegalTiles();

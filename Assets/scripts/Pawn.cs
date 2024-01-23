@@ -58,15 +58,20 @@ public class Pawn : Piece
             
             if (allTiles[i] == onTile){
                 legalTileArray.Add(allTiles[i]); //set legal position => current position
-                if(allTiles.Length > infrontTile(i) && infrontTile(i) > 0){ //boundaries to ensure no index out of bounds error, could replace with try, catch
-                    
-                    legalTileArray.Add(allTiles[infrontTile(i)]); 
-                }
 
-                if(allTiles.Length > infrontTile(infrontTile(i)) && infrontTile(infrontTile(i)) >0){ //another boundary
-                    legalTileArray.Add(allTiles[infrontTile(infrontTile(i))]);
+                int x = infrontTile(i);
+                if(x < allTiles.Length  && x > 0 && allTiles[x].getPieceCount() == 0){ //boundaries to ensure no index out of bounds error, could replace with try, catch
+                    
+                    legalTileArray.Add(allTiles[x]); 
+                }else{
+                    break;
                 }
-                break;
+                x = infrontTile(x);
+                if(x < allTiles.Length  && x > 0 && allTiles[x].getPieceCount() == 0){ //another boundary
+                    legalTileArray.Add(allTiles[x]);
+                }
+                
+                
             }
         }
         return legalTileArray;
@@ -79,11 +84,11 @@ public class Pawn : Piece
             if (allTiles[i] == onTile){
 
                 
-                if((allTiles[infrontTile(i)-1].getPieceCount() > 0) && i%8 != 0){ //check if there is a piece to attack & make sure piece isn't on the edge.
+                if((allTiles[infrontTile(i)-1].getPieceCount() > 0) && i%8 != 0 && allTiles[infrontTile(i)-1].occupiedPiece().tag != this.tag  ){ //check if there is a piece to attack & make sure piece isn't on the edge.
                     legalAttackArray.Add(allTiles[infrontTile(i)-1]);
                     
                 }
-                if(allTiles[infrontTile(i)+1].getPieceCount() > 0 && i%8 != 7){ //check if there is a piece to attack & make sure piece isn' ton the other edge.
+                if(allTiles[infrontTile(i)+1].getPieceCount() > 0 && i%8 != 7  && allTiles[infrontTile(i)+1].occupiedPiece().tag != this.tag){ //check if there is a piece to attack & make sure piece isn' ton the other edge.
                     legalAttackArray.Add(allTiles[infrontTile(i)+1]);
                     
                 }
