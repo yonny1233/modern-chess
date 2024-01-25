@@ -10,7 +10,7 @@ public class Bishop : Piece
     public bool isCollision;
 
     private tile[] allTiles;
-    public List<tile> legalTiles;
+    public List<List<tile>> legalTiles;
     public List<tile> legalAttackTiles;
 
     
@@ -30,6 +30,10 @@ public class Bishop : Piece
 
         legalTiles = legalPositions();
         legalAttackTiles = legalAttacks();
+        if(healthSlider.getHealth() <= 0){
+            Destroy(gameObject);
+            
+        }
         if(!isCollision){
             transform.Translate(Vector3.down * Time.deltaTime * fallSpeed);
         }
@@ -55,35 +59,40 @@ public class Bishop : Piece
         
     }
 
-    public override List<tile> legalPositions(){ 
-        List<tile> legalTileArray = new List<tile>();
+    public override List<List<tile>> legalPositions(){ 
+        List<List<tile>> legalTileArray = new List<List<tile>>();
 
         for(int i = 0; i < allTiles.Length; i++){ //loops through all the tiles until it has found the tile that it is on.
             
             if (allTiles[i] == onTile){
-                legalTileArray.Add(onTile);
+                List<tile> first = new List<tile>();
+                first.Add(onTile);
+                legalTileArray.Add(first);
 
                 bool isForward = true;
                 for(int n = 0; n < 2; n++){ // for backwards and forwards
                     int leftOrRight = 1;
                     for(int m = 0; m < 2; m++){ // for left and right diagonals
                         int counter = 0;
+                        List<tile> second =  new List<tile>();
                         if(i < allTiles.Length && i > 0 && i%8 != 0 && i%8 != 7){
                             counter++;
                         }
                         int x = infrontTile(i, isForward) + leftOrRight;
                         
                         while(x < allTiles.Length && x >= 0 && x%8 != 0 && x%8 != 7 && allTiles[x].getPieceCount() == 0){
-                            legalTileArray.Add(allTiles[x]);
+                            second.Add(allTiles[x]);
                             
                             x = infrontTile(x+leftOrRight, isForward);
                             counter++;
                         }
 
                         if(x < allTiles.Length && x > 0 && counter > 0 && allTiles[x].getPieceCount() == 0){
-                            legalTileArray.Add(allTiles[x]);
+                            second.Add(allTiles[x]);
 
                         }
+                        legalTileArray.Add(second);
+
                         leftOrRight = -1;
                     }
                     isForward = false;
@@ -95,12 +104,52 @@ public class Bishop : Piece
         
         return legalTileArray;
     }
+
+    //after debugging it appears that the turns dont switch when there is a legal attack that clashs with legalTiles, since when I have set the attack to a random tile this doesnt happen
     public override List<tile> legalAttacks(){
         List<tile> legalAttackArray = new List<tile>();
+        for(int i = 0; i < allTiles.Length; i++){ //loops through all the tiles until it has found the tile that it is on.
+            
+            if (allTiles[i] == onTile){
+            
+                bool isForward = true;
+
+                for(int n = 0; n < 2; n++){ // for backwards and forwards
+                    int leftOrRight = 1;
+                    for(int m = 0; m < 2; m++){ // for left and right diagonals
+                        int counter = 0;
+                        if(i < allTiles.Length && i > 0 && i%8 != 0 && i%8 != 7){
+                            counter++;
+                        }
+                        int x = infrontTile(i, isForward) + leftOrRight;
+                        
+                        while(x < allTiles.Length && x >= 0 && x%8 != 0 && x%8 != 7 ){
+                            if(allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag != this.tag){
+                                legalAttackArray.Add(allTiles[x]);
+                                break;
+                            }
+                            
+                            x = infrontTile(x+leftOrRight, isForward);
+                            counter++;
+                        }
+
+                        
+                        leftOrRight = -1;
+                    }
+                    isForward = false;
+                    
+                }
+                break;
+            }
+        }
         return legalAttackArray;
     }
+    public override void ability(bool x){
+        
+    }
+    
 
-    public override List<tile> getLegalTiles(){
+    public override List<List<tile>> getLegalTiles(){
         return legalTiles;
     }
 
@@ -117,6 +166,7 @@ public class Bishop : Piece
         int newIndex = newRow * 8 + col;
         return newIndex;
     }
+   
     
     
 }

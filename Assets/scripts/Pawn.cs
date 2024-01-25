@@ -7,16 +7,20 @@ public class Pawn : Piece
 
     private tile onTile;
     public float fallSpeed;
-    public bool isCollision;
     
+    public bool isCollision;
+
     private tile[] allTiles;
-    public List<tile> legalTiles;
+    public List<List<tile>> legalTiles;
     public List<tile> legalAttackTiles;
+    
     
 
     // Start is called before the first frame update
     public override void Start()
     {
+
+        firstMove = true;
         base.Start();
         allTiles = FindObjectsOfType<tile>(); // stores 1d array of tiles
         setPrevPos(); // set previous position at start so it isn't set to 0,0,0
@@ -28,6 +32,12 @@ public class Pawn : Piece
     {
         legalTiles = legalPositions();
         legalAttackTiles = legalAttacks();
+        
+        if(healthSlider.getHealth() <= 0){
+            Destroy(gameObject);
+            
+        }
+
         if(!isCollision){ //piece falls until it hits a tile
             transform.Translate(Vector3.down * Time.deltaTime * fallSpeed);
         }
@@ -50,26 +60,33 @@ public class Pawn : Piece
     }
     private void OnTriggerExit(Collider other){
         isCollision = false;  //starts falling again.
+    
     }
 
-    public override List<tile> legalPositions(){
-        List<tile> legalTileArray = new List<tile>(); //legal positions: current position, position in front and position infront of that. could replace with recursion.
+    public override List<List<tile>> legalPositions(){
+        List<List<tile>> legalTileArray = new List<List<tile>>(); //legal positions: current position, position in front and position infront of that. could replace with recursion.
         for(int i = 0; i < allTiles.Length; i++){ //loops through all the tiles until it has found the tile that it is on.
             
             if (allTiles[i] == onTile){
-                legalTileArray.Add(allTiles[i]); //set legal position => current position
+                List<tile> first = new List<tile>();
+                allTiles[i].names = "firstTile";
+                first.Add(allTiles[i]);
+                legalTileArray.Add(first); //set legal position => current position
+                List<tile> second = new List<tile>();
 
                 int x = infrontTile(i);
                 if(x < allTiles.Length  && x > 0 && allTiles[x].getPieceCount() == 0){ //boundaries to ensure no index out of bounds error, could replace with try, catch
-                    
-                    legalTileArray.Add(allTiles[x]); 
+                    second.Add(allTiles[x]);
                 }else{
+                    legalTileArray.Add(second);
                     break;
                 }
                 x = infrontTile(x);
-                if(x < allTiles.Length  && x > 0 && allTiles[x].getPieceCount() == 0){ //another boundary
-                    legalTileArray.Add(allTiles[x]);
+                if(x < allTiles.Length  && x > 0 && allTiles[x].getPieceCount() == 0 && firstMove){ //another boundary
+                    second.Add(allTiles[x]);
                 }
+                legalTileArray.Add(second);
+                
                 
                 
             }
@@ -82,8 +99,6 @@ public class Pawn : Piece
         for(int i = 0; i < allTiles.Length; i++){
             
             if (allTiles[i] == onTile){
-
-                
                 if((allTiles[infrontTile(i)-1].getPieceCount() > 0) && i%8 != 0 && allTiles[infrontTile(i)-1].occupiedPiece().tag != this.tag  ){ //check if there is a piece to attack & make sure piece isn't on the edge.
                     legalAttackArray.Add(allTiles[infrontTile(i)-1]);
                     
@@ -96,14 +111,45 @@ public class Pawn : Piece
                 break;
             }
         }
-
-
-
         return legalAttackArray;
 
     }
+    public override void ability(bool x){
+        tile abilityCast;
+        for(int i = 0; i < allTiles.Length; i++){
+            if(allTiles[i] == onTile ){
+                abilityCast = allTiles[infrontTile(i)];
+                if(x){
+                    abilityCast.GetComponent<Renderer>().material.color = new Color(0.6f, 0.4f, 0.2f);
+                    abilityCast.pawnAbility = true;
+                }else{
+                    for (int m = 0; m < allTiles.Length ; m++){
+                        if(allTiles[m] == abilityCast) {
+                            
+                            Debug.Log("works");
+                            int row = m/8;
+                            int col = m%8;
+                            if((row+col)%2 == 1){
+                                abilityCast.GetComponent<Renderer>().material.color = boardManager.Grid.tileColour1;
+                                
+                            }else{
+                                abilityCast.GetComponent<Renderer>().material.color = boardManager.Grid.tileColour2;
+                            }
+                        }
 
-    public override List<tile> getLegalTiles(){
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+
+    }
+    
+
+    public override List<List<tile>> getLegalTiles(){
         return legalTiles;
     }
 
@@ -120,6 +166,9 @@ public class Pawn : Piece
         int newIndex = newRow * 8 + col;
         return newIndex;
     }
+    
+
+    
     
 }
 

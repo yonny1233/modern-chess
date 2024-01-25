@@ -10,7 +10,7 @@ public class King : Piece
     public bool isCollision;
 
     private tile[] allTiles;
-    public List<tile> legalTiles;
+    public List<List<tile>> legalTiles;
     public List<tile> legalAttackTiles;
     
 
@@ -53,17 +53,23 @@ public class King : Piece
         
     }
 
-    public override List<tile> legalPositions(){
-        List<tile> legalTileArray = new List<tile>(); 
+    public override List<List<tile>> legalPositions(){
+        List<List<tile>> legalTileArray = new List<List<tile>>(); 
        
         return legalTileArray;
     }
+
     public override List<tile> legalAttacks(){
         List<tile> legalAttackArray = new List<tile>();
         return legalAttackArray;
         
     }
-    public override List<tile> getLegalTiles(){
+
+    public override void ability(bool x){
+        
+    }
+
+    public override List<List<tile>> getLegalTiles(){
         return legalTiles;
     }
 

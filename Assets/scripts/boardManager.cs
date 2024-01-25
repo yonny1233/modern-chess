@@ -25,12 +25,21 @@ public class boardManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool switchs = false;
         for(int i = 0; i < allTiles.Length; i++ ){
             if(allTiles[i].publicLegal == true){
                 whosTurn = !whosTurn;
+                switchs = true;
+                
                 
                 allTiles[i].publicLegal = false;
 
+            }
+        }
+        for(int i = 0; i < allPieces.Length; i++){ //locks so that the piece doesn't randomly switch state whilst initiating attack
+            if(switchs == true ){
+                allPieces[i].locks = true;
+                
             }
         }
 

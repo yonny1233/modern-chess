@@ -6,24 +6,33 @@ public class tile : MonoBehaviour
 {
 
     private int pieceCount = 0;
-    private Piece chessPiece;
+    //private Piece chessPiece;
     public bool publicLegal;
+    private Piece currentChessPiece;
+    public bool pawnAbility = false;
+    public string names = "";
 
     void Start()
     {
+
         
     }
 
+    private void Update(){
+        if(currentChessPiece is Pawn){
+            currentChessPiece.ability(true);
+        }
+    }
     private void OnTriggerEnter(Collider other){
-        chessPiece = other.GetComponent<Piece>();
+        Piece chessPiece = other.GetComponent<Piece>();
         if (chessPiece != null){
             pieceCount++;
+            if(pieceCount == 1){ //any less means to chess piece and anymore means that the current onTriggerEnter collider is an object that isn't mean
+                currentChessPiece = chessPiece;
+            }
             
         }
-        if (pieceCount>1 ){
-            chessPiece.transform.position = chessPiece.getPrevPos() + new Vector3(0,1,0);;
-            
-        }
+        
        Piece pieceToMove; 
 
         switch(chessPiece){
@@ -51,48 +60,48 @@ public class tile : MonoBehaviour
                 break;
             
         }
-        if(pieceToMove is Pawn  || pieceToMove is Bishop || pieceToMove is Knight || pieceToMove is Rook || pieceToMove is Queen){
+        if((pieceToMove is Pawn  || pieceToMove is Bishop || pieceToMove is Knight || pieceToMove is Rook || pieceToMove is Queen) && pieceToMove.locks == false){
             bool legal = false;
           
-            for(int i = 0; i < pieceToMove.getLegalTiles().Count; i++){
-                
-
-                if(pieceToMove.getLegalTiles().Contains(this)){
+            //pieceToMove.getLegalTiles().Any(sublist => sublist.Contains(this));
+            foreach(List<tile> list in pieceToMove.getLegalTiles()){
+                if(list.Contains(this)){
                     legal = true;
-            
-                    if(pieceToMove.getLegalTiles()[0] != this){
-                        publicLegal = true;
-                    }
-                    
-                    break;
                 }
             }
-            int index = 0;
-
-            for(int i = 0; i < pieceToMove.getLegalAttackTiles().Count; i++){
-                
-                if(pieceToMove.getLegalAttackTiles().Contains(this)){
-                    legal = true;
-                    if(pieceToMove.getLegalAttackTiles()[0] != this){
-                        publicLegal = true;
-                    }
-                    Debug.Log(this.occupiedPiece().pieceHealth); 
-                    
-                    index = i;
-                  
-                    break;
+            if(pieceToMove.getLegalTiles()[0][0] != this){
+                publicLegal = true;
+                if(pieceToMove is Pawn){
+                    pieceToMove.firstMove = false;
                 }
+            }
+
+            
+            if(pieceToMove.getLegalAttackTiles().Contains(this)){
+                legal = true;
+                publicLegal = true;
+                currentChessPiece.healthSlider.setHealth(currentChessPiece.healthSlider.getHealth() - pieceToMove.attackDamage());
+                if(currentChessPiece.healthSlider.getHealth() <= 0){
+                    pieceCount--;
+                    currentChessPiece = pieceToMove; //sets the current piece on the tile to the piece that has killed the previous piece
+                }
+        
             }
 
             if(!legal){
                 pieceToMove.transform.position = chessPiece.getPrevPos()  +  new Vector3(0,0.1f,0);; 
-                publicLegal = false;   
-            }
-            if(legal){
                 
-
+                publicLegal = false;  
             }
         }
+
+        if (pieceCount>1 ){
+            chessPiece.transform.position = chessPiece.getPrevPos() + new Vector3(0,1,0);;
+            //chessPiece = currentChessPiece;
+            
+        }
+        
+
     }
 
     void OnTriggerExit(Collider other)
@@ -102,17 +111,24 @@ public class tile : MonoBehaviour
         Piece chessPiece = other.GetComponent<Piece>();
         if (chessPiece != null){
             pieceCount--;
-            
+           if (chessPiece is Pawn){
+            chessPiece.ability(false);
+           }
         }
+        
     }
     public Piece occupiedPiece(){
-        if (chessPiece != null){
-           return chessPiece; 
+        if (currentChessPiece != null){
+           return currentChessPiece; 
         }else  
             return null;
         
     }
     public int getPieceCount(){
         return pieceCount;
+    }
+    public void setPieceCount(int x){
+        pieceCount = x;
+        
     }
 }

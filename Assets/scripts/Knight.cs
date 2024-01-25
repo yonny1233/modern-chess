@@ -10,7 +10,7 @@ public class Knight : Piece
     public bool isCollision;
 
     private tile[] allTiles;
-    public List<tile> legalTiles;
+    public List<List<tile>> legalTiles;
     public List<tile> legalAttackTiles;
     
 
@@ -29,6 +29,11 @@ public class Knight : Piece
     {
         legalTiles = legalPositions();
         legalAttackTiles = legalAttacks();
+
+        if(healthSlider.getHealth() <= 0){
+            Destroy(gameObject);
+            
+        }
         if(!isCollision){
             transform.Translate(Vector3.down * Time.deltaTime * fallSpeed);
         }
@@ -54,38 +59,42 @@ public class Knight : Piece
         
     }
 
-    public override List<tile> legalPositions(){
-        List<tile> legalTileArray = new List<tile>(); 
+    public override List<List<tile>> legalPositions(){
+        List<List<tile>> legalTileArray = new List<List<tile>>(); 
         for(int i = 0; i < allTiles.Length; i++){ //loops through all the tiles until it has found the tile that it is on.
             
             if (allTiles[i] == onTile){
-                legalTileArray.Add(onTile);
+                List<tile> first = new List<tile>();
+                first.Add(onTile);
+                legalTileArray.Add(first);
+                
 
                 bool isForward = true;
+                List<tile> second =  new List<tile>();
                 for(int n = 0; n < 2; n++){ // for backwards and forwards
-
+                    
                     int x = infrontTile( infrontTile( i, isForward ), isForward )-1;
-                    if(x <= allTiles.Length && x >= 0 && allTiles[x].getPieceCount() == 0  && i%8 != 0 ){
-                        legalTileArray.Add(allTiles[x] );
+                    if(x <= allTiles.Length && x >= 0 && i%8 != 0 && allTiles[x].getPieceCount() == 0   ){
+                        second.Add(allTiles[x] );
                     }
                     x = infrontTile(i, isForward )-2;
                     
-                    if(x <= allTiles.Length && x >= 0  && allTiles[x].getPieceCount() == 0 && i%8 != 0 && i%8 != 1){
-                        legalTileArray.Add(allTiles[x] );
+                    if(x <= allTiles.Length && x >= 0 && i%8 != 0 && i%8 != 1 && allTiles[x].getPieceCount() == 0 ){
+                        second.Add(allTiles[x] );
                         
                     }
                     x = infrontTile( infrontTile( i, isForward ), isForward )+1;
                     if(x <= allTiles.Length && x >= 0 && i%8 != 7 && allTiles[x].getPieceCount() == 0) {
-                        legalTileArray.Add(allTiles[x] ); 
+                        second.Add(allTiles[x] ); 
                         
                     }
                     x = infrontTile( i, isForward )+2;
-                    if(x <= allTiles.Length && x >= 0  && allTiles[x].getPieceCount() == 0 && i%8 != 7 && i%8 != 6){
-                        legalTileArray.Add(allTiles[x] );
+                    if(x <= allTiles.Length && x >= 0  && i%8 != 7 && i%8 != 6 && allTiles[x].getPieceCount() == 0){
+                        second.Add(allTiles[x] );
                     }
                     isForward = false;
-                    
                 }
+                legalTileArray.Add(second);
                 break;
             }
         }
@@ -94,10 +103,45 @@ public class Knight : Piece
     }
     public override List<tile> legalAttacks(){
         List<tile> legalAttackArray = new List<tile>();
+        for(int i = 0; i < allTiles.Length; i++){ //loops through all the tiles until it has found the tile that it is on.
+            
+            if (allTiles[i] == onTile){
+
+                bool isForward = true;
+                for(int n = 0; n < 2; n++){ // for backwards and forwards
+
+                    int x = infrontTile( infrontTile( i, isForward ), isForward )-1;
+                    if(x <= allTiles.Length && x >= 0 && i%8 != 0 && allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag != this.tag ){
+                        legalAttackArray.Add(allTiles[x] );
+                    }
+                    x = infrontTile(i, isForward )-2;
+                    
+                    if(x <= allTiles.Length && x >= 0 && i%8 != 0 && i%8 != 1 && allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag != this.tag ){
+                        legalAttackArray.Add(allTiles[x] );
+                        
+                    }
+                    x = infrontTile( infrontTile( i, isForward ), isForward )+1;
+                    if(x <= allTiles.Length && x >= 0 && i%8 != 7 && allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag != this.tag ) {
+                        legalAttackArray.Add(allTiles[x] ); 
+                        
+                    }
+                    x = infrontTile( i, isForward )+2;
+                    if(x <= allTiles.Length && x >= 0 && i%8 != 7 && i%8 != 6  && allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag != this.tag ){
+                        legalAttackArray.Add(allTiles[x] );
+                    }
+                    isForward = false;
+                    
+                }
+                break;
+            }
+        }
         return legalAttackArray;
     }
+    public override void ability(bool x){
+        
+    }
 
-    public override List<tile> getLegalTiles(){
+    public override List<List<tile>> getLegalTiles(){
         
         return legalTiles;
     }

@@ -13,14 +13,21 @@ public abstract class Piece : MonoBehaviour
 
     public healthSlider healthSlider;
     public int pieceHealth;
+    public int attackDMG;
+    public bool locks;
+    public bool firstMove;
+    
     
 
     public virtual void Start(){
-
+        
+        locks = true; //locks so that the piece doesn't randomly switch state whilst initiating attack
         boardManager = FindObjectOfType<boardManager>();
         healthSlider.setMaxHealth(pieceHealth);
         
     }
+
+    
 
     public Vector3 getMousePos(){
         return Camera.main.WorldToScreenPoint(transform.position);
@@ -29,18 +36,22 @@ public abstract class Piece : MonoBehaviour
 
     private void OnMouseDown(){
         
+        locks = false; //unlocks when piece is picked up 
+        ability(false);
         if(gameObject.tag == blackOrWhite()){
             displayPositions(true);
             gameObject.GetComponent<Renderer>().material.color = Color.red;
             mousePosition = Input.mousePosition - getMousePos(); 
             setPrevPos();  
-            Debug.Log(boardManager.whosTurn);
         }
+        
         
     }
     private void OnMouseUp()
     {
+        
         displayPositions(false);
+
         if(gameObject.tag == "White"){
                 gameObject.GetComponent<Renderer>().material.color = Color.white;
             }
@@ -80,37 +91,49 @@ public abstract class Piece : MonoBehaviour
 
     public void displayPositions(bool x){
 
-        List<tile> both = getLegalTiles();
-        both.AddRange(getLegalAttackTiles());
-    
-        foreach(tile Tile in both ){
-            if(x){
-                Tile.GetComponent<Renderer>().material.color = Color.red;
-            }else{
-                for (int i = 0; i < boardManager.allTiles.Length ; i++){
-                    if(boardManager.allTiles[i] == Tile) {
-                        int row = i/8;
-                        int col = i%8;
-                        if((row+col)%2 == 1){
-                            Tile.GetComponent<Renderer>().material.color = boardManager.Grid.tileColour1;
-                            
-                        }else{
-                            Tile.GetComponent<Renderer>().material.color = boardManager.Grid.tileColour2;
+        List<List<tile>> both = getLegalTiles();
+        both.Add(getLegalAttackTiles());
+
+        foreach(List<tile> inner in both){
+            foreach(tile Tile in inner ){
+                if(x){
+                    
+                    Tile.GetComponent<Renderer>().material.color = Color.red;
+                }else{
+                    for (int i = 0; i < boardManager.allTiles.Length ; i++){
+                        if(boardManager.allTiles[i] == Tile) {
+                            int row = i/8;
+                            int col = i%8;
+                            if((row+col)%2 == 1){
+                                Tile.GetComponent<Renderer>().material.color = boardManager.Grid.tileColour1;
+                                
+                            }else{
+                                Tile.GetComponent<Renderer>().material.color = boardManager.Grid.tileColour2;
+                            }
                         }
+
                     }
 
                 }
-
             }
         }
     }
-    public abstract List<tile> legalPositions();
+    public int attackDamage(){
+        return attackDMG;
+    }
+    
+    public abstract List<List<tile>> legalPositions();
 
     public abstract List<tile> legalAttacks();
 
-    public abstract List<tile> getLegalTiles();
+    public abstract List<List<tile>> getLegalTiles();
 
     public abstract List<tile> getLegalAttackTiles();
+
+    public abstract void ability(bool x);
+
+
+    
 
     
 
