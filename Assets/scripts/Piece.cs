@@ -16,6 +16,7 @@ public abstract class Piece : MonoBehaviour
     public int attackDMG;
     public bool locks;
     public bool firstMove;
+    public bool mudPawnAbility;
     
     
 
@@ -37,8 +38,9 @@ public abstract class Piece : MonoBehaviour
     private void OnMouseDown(){
         
         locks = false; //unlocks when piece is picked up 
-        ability(false);
+        
         if(gameObject.tag == blackOrWhite()){
+            ability(false);
             displayPositions(true);
             gameObject.GetComponent<Renderer>().material.color = Color.red;
             mousePosition = Input.mousePosition - getMousePos(); 
@@ -50,7 +52,6 @@ public abstract class Piece : MonoBehaviour
     private void OnMouseUp()
     {
         
-        displayPositions(false);
 
         if(gameObject.tag == "White"){
                 gameObject.GetComponent<Renderer>().material.color = Color.white;
@@ -60,6 +61,7 @@ public abstract class Piece : MonoBehaviour
         }
         if(gameObject.tag == blackOrWhite()){
             transform.position = transform.position - new Vector3(0,1,0);
+            displayPositions(false);
         }
 
     }

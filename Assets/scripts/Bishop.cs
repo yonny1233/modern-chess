@@ -80,16 +80,18 @@ public class Bishop : Piece
                         }
                         int x = infrontTile(i, isForward) + leftOrRight;
                         
-                        while(x < allTiles.Length && x >= 0 && x%8 != 0 && x%8 != 7 && allTiles[x].getPieceCount() == 0){
-                            second.Add(allTiles[x]);
+                        while(x < allTiles.Length && x >= 0 && x%8 != 0 && x%8 != 7 && allTiles[x].getPieceCount() == 0){  
                             
+                            second.Add(allTiles[x]);
+                            if(onTile.pawnAbility){
+                                break;
+                            }
                             x = infrontTile(x+leftOrRight, isForward);
                             counter++;
                         }
 
                         if(x < allTiles.Length && x > 0 && counter > 0 && allTiles[x].getPieceCount() == 0){
                             second.Add(allTiles[x]);
-
                         }
                         legalTileArray.Add(second);
 
@@ -110,7 +112,7 @@ public class Bishop : Piece
         List<tile> legalAttackArray = new List<tile>();
         for(int i = 0; i < allTiles.Length; i++){ //loops through all the tiles until it has found the tile that it is on.
             
-            if (allTiles[i] == onTile){
+            if (allTiles[i] == onTile && !onTile.pawnAbility){
             
                 bool isForward = true;
 
@@ -124,10 +126,14 @@ public class Bishop : Piece
                         int x = infrontTile(i, isForward) + leftOrRight;
                         
                         while(x < allTiles.Length && x >= 0 && x%8 != 0 && x%8 != 7 ){
-                            if(allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag != this.tag){
+                            if(allTiles[x].getPieceCount() > 0 && allTiles[x].occupiedPiece().tag == this.tag){
+                                break;
+                            }
+                            else if(allTiles[x].getPieceCount() > 0){
                                 legalAttackArray.Add(allTiles[x]);
                                 break;
                             }
+                            
                             
                             x = infrontTile(x+leftOrRight, isForward);
                             counter++;

@@ -9,21 +9,25 @@ public class tile : MonoBehaviour
     //private Piece chessPiece;
     public bool publicLegal;
     private Piece currentChessPiece;
-    public bool pawnAbility = false;
+    public bool pawnAbility = false; // mudPawnAbility stored locally
     public string names = "";
+
 
     void Start()
     {
-
+        
         
     }
 
     private void Update(){
-        if(currentChessPiece is Pawn){
+        if(currentChessPiece is Pawn && currentChessPiece.mudPawnAbility == true ){
             currentChessPiece.ability(true);
+            
         }
+        
     }
     private void OnTriggerEnter(Collider other){
+        
         Piece chessPiece = other.GetComponent<Piece>();
         if (chessPiece != null){
             pieceCount++;
@@ -81,6 +85,7 @@ public class tile : MonoBehaviour
                 legal = true;
                 publicLegal = true;
                 currentChessPiece.healthSlider.setHealth(currentChessPiece.healthSlider.getHealth() - pieceToMove.attackDamage());
+                
                 if(currentChessPiece.healthSlider.getHealth() <= 0){
                     pieceCount--;
                     currentChessPiece = pieceToMove; //sets the current piece on the tile to the piece that has killed the previous piece
@@ -111,12 +116,13 @@ public class tile : MonoBehaviour
         Piece chessPiece = other.GetComponent<Piece>();
         if (chessPiece != null){
             pieceCount--;
-           if (chessPiece is Pawn){
-            chessPiece.ability(false);
-           }
+           /*if (chessPiece is Pawn){
+                chessPiece.mudPawnAbility = false;
+           }*/
         }
         
     }
+
     public Piece occupiedPiece(){
         if (currentChessPiece != null){
            return currentChessPiece; 

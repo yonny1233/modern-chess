@@ -57,9 +57,11 @@ public class Pawn : Piece
     {
         isCollision = true; //when hitting a tile then a collision is detected so no more falling.
         onTile = other.GetComponent<tile>(); //set to the tile that the piece is on.
+        mudPawnAbility = true;
     }
     private void OnTriggerExit(Collider other){
         isCollision = false;  //starts falling again.
+        mudPawnAbility = false;
     
     }
 
@@ -117,16 +119,18 @@ public class Pawn : Piece
     public override void ability(bool x){
         tile abilityCast;
         for(int i = 0; i < allTiles.Length; i++){
-            if(allTiles[i] == onTile ){
+            if(allTiles[i] == onTile && !firstMove ){
                 abilityCast = allTiles[infrontTile(i)];
                 if(x){
                     abilityCast.GetComponent<Renderer>().material.color = new Color(0.6f, 0.4f, 0.2f);
                     abilityCast.pawnAbility = true;
+                    
                 }else{
+                    abilityCast.pawnAbility = false;
                     for (int m = 0; m < allTiles.Length ; m++){
+    
                         if(allTiles[m] == abilityCast) {
                             
-                            Debug.Log("works");
                             int row = m/8;
                             int col = m%8;
                             if((row+col)%2 == 1){
